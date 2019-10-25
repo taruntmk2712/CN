@@ -8,33 +8,17 @@
 #include "ns3/netanim-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/animation-interface.h"
-// Default Network Topology
-//
-//
-10.1.1.0
-// n0 -------------- n1 n2 n3 n4
-// point-to-point | | | |
-//
-================
-//
-LAN 10.1.2.0
-24using namespace ns3;
+using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("SecondScriptExample");
 int
 main (int argc, char *argv[])
 {
 bool verbose = true;
 uint32_t nCsma = 3,np2p=2;
-CommandLine cmd;
-cmd.AddValue ("nCsma", "Number of \"extra\" CSMA nodes/devices", nCsma);
-cmd.AddValue ("verbose", "Tell echo applications to log if true", verbose);
-cmd.Parse (argc,argv);
-if (verbose)
-{
+
 LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
 LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-}
-nCsma = nCsma == 0 ? 1 : nCsma;
+
 NodeContainer p2pNodes;
 p2pNodes.Create (np2p);
 NodeContainer csmaNodes;
@@ -50,7 +34,7 @@ csma.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
 csma.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560)));
 NetDeviceContainer csmaDevices;
 csmaDevices = csma.Install (csmaNodes);
-25InternetStackHelper stack;
+InternetStackHelper stack;
 stack.Install (p2pNodes.Get (0));
 stack.Install (csmaNodes);
 Ipv4AddressHelper address;
@@ -84,3 +68,9 @@ Simulator::Run ();
 Simulator::Destroy ();
 return 0;
 }
+/*
+OUTPUT:
+At time 2s client sent 1024 bytes to 10.1.2.4 port 9
+At time 2.0078s server received 1024 bytes from 10.1.1.1 port 49153
+At time 2.0078s server sent 1024 bytes to 10.1.1.1 port 49153
+At time 2.01761s client received 1024 bytes from 10.1.2.4 port 9
